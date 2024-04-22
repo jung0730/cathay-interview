@@ -4,21 +4,14 @@ import { useState } from "react";
 const DateRangePicker = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const currentDate = new Date()
 
   const handleDayClick = (day) => {
-    if (!startDate) {
-      setStartDate(day);
-      return;
-    }
-    if (day < startDate) {
+    if (!startDate || day < startDate) {
       setStartDate(day);
       setEndDate(null);
-      return;
-    }
-    if (!endDate || day >= startDate) {
+    } else if (!endDate || day >= startDate) {
       setEndDate(day);
-      return;
     }
   };
 
@@ -48,7 +41,8 @@ const DateRangePicker = () => {
     const lastDisplayDay = new Date(lastDayOfMonth);
     lastDisplayDay.setDate(lastDisplayDay.getDate() + (6 - endingDay));
   
-    for (let i = 0; i < 42; i++) {
+    const MAX_DAYS = 42;
+    for (let i = 0; i < MAX_DAYS; i++) {
       const day = new Date(firstDisplayDay);
       day.setDate(day.getDate() + i);
       if (day > lastDisplayDay) break;
@@ -83,7 +77,7 @@ const DateRangePicker = () => {
           <button className="w-[44px] h-[44px] hover:bg-gray disabled cursor-not-allowed">
             {'<' }
           </button>
-          <div className="current-month">{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</div>
+          <div>{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</div>
           <button className="w-[44px] h-[44px] hover:bg-gray disabled cursor-not-allowed">
             {'>'}
           </button>
@@ -91,6 +85,11 @@ const DateRangePicker = () => {
         <div className="grid grid-cols-7 gap-5">
           {renderDays()}
         </div>
+        <div>
+      </div>
+      <br/>
+      <div>Start Date: {startDate ? startDate.toLocaleDateString() : 'N/A'}</div>
+      <div>End Date: {endDate ? endDate.toLocaleDateString() : 'N/A'}</div>
       </div>
     </div>
   );
