@@ -4,7 +4,9 @@ import { useState } from "react";
 const DateRangePicker = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const currentDate = new Date()
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
 
   const handleDayClick = (day) => {
     if (!startDate || day < startDate) {
@@ -20,23 +22,23 @@ const DateRangePicker = () => {
   };
 
   const isNonCurrentMonth = (day) => {
-    return day.getMonth() !== currentDate.getMonth();
+    return day.getMonth() !== currentMonth;
   };
 
   const renderDays = () => {
     const days = [];
-    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
     const startingDay = firstDayOfMonth.getDay();
     const totalDays = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() + 1,
+      currentYear,
+      currentMonth + 1,
       0
     ).getDate();
   
     const firstDisplayDay = new Date(firstDayOfMonth);
     firstDisplayDay.setDate(firstDisplayDay.getDate() - startingDay);
   
-    const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), totalDays);
+    const lastDayOfMonth = new Date(currentYear, currentMonth, totalDays);
     const endingDay = lastDayOfMonth.getDay();
     const lastDisplayDay = new Date(lastDayOfMonth);
     lastDisplayDay.setDate(lastDisplayDay.getDate() + (6 - endingDay));
@@ -46,18 +48,18 @@ const DateRangePicker = () => {
       const day = new Date(firstDisplayDay);
       day.setDate(day.getDate() + i);
       if (day > lastDisplayDay) break;
-      const isNonCurrentMonthDay = isNonCurrentMonth(day);
-      const isDisabledDay = isNonCurrentMonthDay || (day.getMonth() !== currentDate.getMonth());
   
       days.push(
         <div
           key={day.toDateString()}
-          className={`${isNonCurrentMonth(day) ? 'cursor-not-allowed disabled bg-gray-light' : 'hover:bg-gray active:bg-blue cursor-pointer'}
-          ${isInRange(day) ? 'bg-blue' : ''}
+          className={`${isNonCurrentMonth(day) ? 'cursor-not-allowed disabled bg-gray-light' : 'hover:bg-gray cursor-pointer'}
+          ${isInRange(day)? 'bg-blue' : ''}
+          ${day.getTime() === startDate?.getTime() ? 'bg-blue' : ''}
+          ${day.getTime() === endDate?.getTime() ? 'bg-blue' : ''}
           ${currentDate.getDate() === i ? 'bg-yellow' : ''} 
           flex justify-center items-center w-[50px] h-[30px]`}
           onClick={() => {
-            if (!isDisabledDay) {
+            if (!isNonCurrentMonth(day)) {
               handleDayClick(day);
             }
           }}
@@ -77,7 +79,7 @@ const DateRangePicker = () => {
           <button className="w-[44px] h-[44px] hover:bg-gray disabled cursor-not-allowed">
             {'<' }
           </button>
-          <div>{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</div>
+          <div data-testid="current-month">{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</div>
           <button className="w-[44px] h-[44px] hover:bg-gray disabled cursor-not-allowed">
             {'>'}
           </button>
@@ -88,8 +90,8 @@ const DateRangePicker = () => {
         <div>
       </div>
       <br/>
-      <div>Start Date: {startDate ? startDate.toLocaleDateString() : 'N/A'}</div>
-      <div>End Date: {endDate ? endDate.toLocaleDateString() : 'N/A'}</div>
+      <div data-testid="start-date">Start Date: {startDate ? startDate.toLocaleDateString() : 'N/A'}</div>
+      <div data-testid="end-date">End Date: {endDate ? endDate.toLocaleDateString() : 'N/A'}</div>
       </div>
     </div>
   );
